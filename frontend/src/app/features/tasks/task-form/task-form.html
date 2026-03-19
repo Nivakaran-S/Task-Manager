@@ -1,1 +1,49 @@
-<p>task-form works!</p>
+<div class="form-container">
+  <div class="glass-card zoom-in">
+    <div class="header">
+      <button class="back-btn" routerLink="/tasks">
+        ← Back
+      </button>
+      <h2>{{ isEditMode ? 'Edit Task' : 'New Task' }}</h2>
+    </div>
+
+    <div *ngIf="isLoading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading...</p>
+    </div>
+
+    <div *ngIf="errorMessage" class="error-alert">{{ errorMessage }}</div>
+
+    <form *ngIf="!isLoading" [formGroup]="taskForm" (ngSubmit)="onSubmit()">
+      
+      <div class="input-group">
+        <label>Title</label>
+        <input type="text" formControlName="title" placeholder="What needs to be done?"
+               [class.invalid]="taskForm.get('title')?.invalid && taskForm.get('title')?.touched">
+      </div>
+
+      <div class="input-group">
+        <label>Description (Optional) <span class="char-count">{{ taskForm.get('description')?.value?.length || 0 }}/500</span></label>
+        <textarea formControlName="description" rows="4" placeholder="Add some details..."
+                  [class.invalid]="taskForm.get('description')?.invalid && taskForm.get('description')?.touched"></textarea>
+      </div>
+
+      <div class="input-group">
+        <label>Status</label>
+        <div class="custom-select">
+          <select formControlName="status">
+            <option value="TO_DO">To Do</option>
+            <option value="IN_PROGRESS">In Progress</option>
+            <option value="DONE">Done</option>
+          </select>
+        </div>
+      </div>
+
+      <button type="submit" class="submit-btn" [disabled]="taskForm.invalid || isSubmitting">
+        <span *ngIf="!isSubmitting">{{ isEditMode ? 'Update Task' : 'Create Task' }}</span>
+        <div class="spinner" *ngIf="isSubmitting"></div>
+      </button>
+
+    </form>
+  </div>
+</div>

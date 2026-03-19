@@ -1,1 +1,152 @@
-<p>task-list works!</p>
+<div class="dashboard-container">
+  <!-- Navbar -->
+  <nav class="glass-nav">
+    <div class="brand">
+      <div class="logo-icon"></div>
+      <h2>Taskify</h2>
+    </div>
+    <div class="nav-actions">
+      <button class="icon-btn" routerLink="/tasks/new">
+        <svg xmlns="http://www.w3.org/2001/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        New Task
+      </button>
+      <button class="logout-btn" (click)="logout()">Sign Out</button>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="dashboard-content">
+    <div class="header-section">
+      <h1>My Board</h1>
+      <p>Manage your tasks efficiently</p>
+    </div>
+
+    <div *ngIf="isLoading()" class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading your tasks...</p>
+    </div>
+
+    <!-- Group the drag and drop lists together -->
+    <div *ngIf="!isLoading()" class="kanban-board" cdkDropListGroup>
+      
+      <!-- TO DO Column -->
+      <div class="kanban-column">
+        <div class="column-header">
+          <div class="header-title">
+            <span class="dot dot-todo"></span>
+            <h3>To Do</h3>
+          </div>
+          <span class="task-count">{{ todoTasks().length }}</span>
+        </div>
+        
+        <div 
+          class="tasks-container"
+          cdkDropList
+          [cdkDropListData]="todoTasks()"
+          (cdkDropListDropped)="onDrop($event, 'TO_DO')">
+          <div *ngFor="let task of todoTasks()" class="task-card fade-in" cdkDrag>
+            <!-- Custom preview element during drag -->
+            <div *cdkDragPreview class="task-card fade-in preview-card">
+              <div class="task-header">
+                <h4>{{ task.title }}</h4>
+              </div>
+              <p class="task-desc">{{ task.description || 'No description provided' }}</p>
+            </div>
+            
+            <div class="task-header">
+              <h4>{{ task.title }}</h4>
+              <div class="task-actions">
+                <button class="action-btn edit" [routerLink]="['/tasks/edit', task.id]">✏️</button>
+                <button class="action-btn delete" (click)="deleteTask(task.id)">🗑️</button>
+              </div>
+            </div>
+            <p class="task-desc">{{ task.description || 'No description provided' }}</p>
+            <div class="task-footer">
+              <span class="date-badge">🕒 {{ task.createdAt | date:'shortDate' }}</span>
+              <a [routerLink]="['/tasks', task.id]" class="view-link">View Details</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- IN PROGRESS Column -->
+      <div class="kanban-column">
+        <div class="column-header">
+          <div class="header-title">
+            <span class="dot dot-progress"></span>
+            <h3>In Progress</h3>
+          </div>
+          <span class="task-count">{{ inProgressTasks().length }}</span>
+        </div>
+        
+        <div 
+          class="tasks-container"
+          cdkDropList
+          [cdkDropListData]="inProgressTasks()"
+          (cdkDropListDropped)="onDrop($event, 'IN_PROGRESS')">
+          <div *ngFor="let task of inProgressTasks()" class="task-card border-progress fade-in" cdkDrag>
+            <div *cdkDragPreview class="task-card border-progress fade-in preview-card">
+              <div class="task-header">
+                <h4>{{ task.title }}</h4>
+              </div>
+              <p class="task-desc">{{ task.description || 'No description provided' }}</p>
+            </div>
+
+             <div class="task-header">
+              <h4>{{ task.title }}</h4>
+              <div class="task-actions">
+                <button class="action-btn edit" [routerLink]="['/tasks/edit', task.id]">✏️</button>
+                <button class="action-btn delete" (click)="deleteTask(task.id)">🗑️</button>
+              </div>
+            </div>
+            <p class="task-desc">{{ task.description || 'No description provided' }}</p>
+            <div class="task-footer">
+              <span class="date-badge">🕒 {{ task.createdAt | date:'shortDate' }}</span>
+              <a [routerLink]="['/tasks', task.id]" class="view-link">View Details</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DONE Column -->
+      <div class="kanban-column">
+        <div class="column-header">
+          <div class="header-title">
+            <span class="dot dot-done"></span>
+            <h3>Done</h3>
+          </div>
+          <span class="task-count">{{ doneTasks().length }}</span>
+        </div>
+        
+        <div 
+          class="tasks-container"
+          cdkDropList
+          [cdkDropListData]="doneTasks()"
+          (cdkDropListDropped)="onDrop($event, 'DONE')">
+          <div *ngFor="let task of doneTasks()" class="task-card border-done fade-in" cdkDrag>
+            <div *cdkDragPreview class="task-card border-done fade-in preview-card">
+              <div class="task-header">
+                <h4 class="done-title">{{ task.title }}</h4>
+              </div>
+              <p class="task-desc">{{ task.description || 'No description provided' }}</p>
+            </div>
+
+            <div class="task-header">
+              <h4 class="done-title">{{ task.title }}</h4>
+              <div class="task-actions">
+                <button class="action-btn edit" [routerLink]="['/tasks/edit', task.id]">✏️</button>
+                <button class="action-btn delete" (click)="deleteTask(task.id)">🗑️</button>
+              </div>
+            </div>
+            <p class="task-desc">{{ task.description || 'No description provided' }}</p>
+            <div class="task-footer">
+              <span class="date-badge">🕒 {{ task.createdAt | date:'shortDate' }}</span>
+              <a [routerLink]="['/tasks', task.id]" class="view-link">View Details</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+  </main>
+</div>

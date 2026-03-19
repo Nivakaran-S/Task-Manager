@@ -1,1 +1,41 @@
-<p>register works!</p>
+<div class="auth-container">
+  <div class="glass-card zoom-in">
+    <div class="brand">
+      <div class="logo-icon"></div>
+      <h2>Taskify</h2>
+    </div>
+    
+    <h3>Create Account</h3>
+    <p class="subtitle">Join us to manage your tasks beautifully.</p>
+
+    <div *ngIf="errorMessage" class="error-alert">{{ errorMessage }}</div>
+    <div *ngIf="successMessage" class="success-alert">{{ successMessage }}</div>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <div class="input-group">
+        <label>Username</label>
+        <div class="input-wrapper">
+          <input type="text" formControlName="username" placeholder="Choose a username"
+                 [class.invalid]="registerForm.get('username')?.invalid && registerForm.get('username')?.touched">
+        </div>
+      </div>
+      
+      <div class="input-group">
+        <label>Password</label>
+        <div class="input-wrapper">
+          <input type="password" formControlName="password" placeholder="Create a password"
+                 [class.invalid]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched">
+        </div>
+      </div>
+      
+      <button type="submit" class="submit-btn" [disabled]="registerForm.invalid || isLoading || successMessage">
+        <span *ngIf="!isLoading">Create Account</span>
+        <div class="spinner" *ngIf="isLoading"></div>
+      </button>
+    </form>
+    
+    <div class="auth-links">
+      <p>Already have an account? <a routerLink="/login">Sign in</a></p>
+    </div>
+  </div>
+</div>

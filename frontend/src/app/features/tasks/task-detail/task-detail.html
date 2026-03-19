@@ -1,1 +1,45 @@
-<p>task-detail works!</p>
+<div class="detail-container">
+  <div class="glass-card zoom-in">
+    <div class="header">
+      <button class="back-btn" routerLink="/tasks">
+        ← Back to Board
+      </button>
+      <h2>Task Details</h2>
+    </div>
+
+    <div *ngIf="loading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading...</p>
+    </div>
+
+    <div *ngIf="errorMessage" class="error-alert">
+      {{ errorMessage }}
+    </div>
+
+    <div class="task-content" *ngIf="task && !loading">
+      <div class="status-barge" 
+           [ngClass]="{
+             'bg-todo': task.status === 'TO_DO', 
+             'bg-progress': task.status === 'IN_PROGRESS', 
+             'bg-done': task.status === 'DONE'
+           }">
+        {{ task.status.replace('_', ' ') }}
+      </div>
+
+      <h1 class="task-title">{{ task.title }}</h1>
+      <div class="meta-data">
+        <span class="date">🕒 Created {{ task.createdAt | date:'medium' }}</span>
+      </div>
+      
+      <div class="description-box">
+        <h4>Description</h4>
+        <p>{{ task.description || 'No description provided for this task.' }}</p>
+      </div>
+
+      <div class="action-footer">
+        <button class="delete-btn" (click)="deleteTask()">Delete Task</button>
+        <button class="edit-btn" [routerLink]="['/tasks/edit', task.id]">Edit Task</button>
+      </div>
+    </div>
+  </div>
+</div>

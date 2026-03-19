@@ -1,1 +1,40 @@
-<p>login works!</p>
+<div class="auth-container">
+  <div class="glass-card zoom-in">
+    <div class="brand">
+      <div class="logo-icon"></div>
+      <h2>Taskify</h2>
+    </div>
+    
+    <h3>Welcome back</h3>
+    <p class="subtitle">Please enter your details to sign in.</p>
+
+    <div *ngIf="errorMessage" class="error-alert">{{ errorMessage }}</div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div class="input-group">
+        <label>Username</label>
+        <div class="input-wrapper">
+          <input type="text" formControlName="username" placeholder="Enter your username"
+                 [class.invalid]="loginForm.get('username')?.invalid && loginForm.get('username')?.touched">
+        </div>
+      </div>
+      
+      <div class="input-group">
+        <label>Password</label>
+        <div class="input-wrapper">
+          <input type="password" formControlName="password" placeholder="••••••••"
+                 [class.invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+        </div>
+      </div>
+      
+      <button type="submit" class="submit-btn" [disabled]="loginForm.invalid || isLoading">
+        <span *ngIf="!isLoading">Sign In</span>
+        <div class="spinner" *ngIf="isLoading"></div>
+      </button>
+    </form>
+    
+    <div class="auth-links">
+      <p>Don't have an account? <a routerLink="/register">Sign up</a></p>
+    </div>
+  </div>
+</div>
