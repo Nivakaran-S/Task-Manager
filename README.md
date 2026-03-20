@@ -64,6 +64,24 @@ Because this app uses JWT Authentication to keep data secure, you can't just jum
 
 ---
 
+## 📸 Project Screenshots
+
+Here's a quick look at the application in action:
+
+<div align="center">
+  <h3>Login & Registration</h3>
+  <img src="assets/Screenshot 2026-03-20 151659.png" width="800" alt="Login Page">
+  <br><br>
+  <img src="assets/Screenshot 2026-03-20 151714.png" width="800" alt="Registration Page">
+  
+  <h3>Kanban Board & Task Management</h3>
+  <img src="assets/Screenshot 2026-03-20 151729.png" width="800" alt="Task Dashboard">
+  <br><br>
+  <img src="assets/Screenshot 2026-03-20 151748.png" width="800" alt="Task Interaction">
+</div>
+
+---
+
 ## 📖 API Documentation (Swagger)
 
 Curious about how the API responses look? I've bundled an automated documentation page for the backend!
