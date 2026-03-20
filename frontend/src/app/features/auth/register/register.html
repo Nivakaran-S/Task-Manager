@@ -28,6 +28,17 @@
         </div>
       </div>
       
+      <div class="input-group">
+        <label>Confirm Password</label>
+        <div class="input-wrapper">
+          <input type="password" formControlName="confirmPassword" placeholder="Confirm your password"
+                 [class.invalid]="(registerForm.get('confirmPassword')?.invalid || registerForm.hasError('passwordMismatch')) && registerForm.get('confirmPassword')?.touched">
+        </div>
+        <small class="error-text" *ngIf="registerForm.hasError('passwordMismatch') && registerForm.get('confirmPassword')?.touched" style="color: #fca5a5; font-size: 0.8rem; display: block; margin-top: 0.5rem;">
+          Passwords do not match
+        </small>
+      </div>
+      
       <button type="submit" class="submit-btn" [disabled]="registerForm.invalid || isLoading || successMessage">
         <span *ngIf="!isLoading">Create Account</span>
         <div class="spinner" *ngIf="isLoading"></div>

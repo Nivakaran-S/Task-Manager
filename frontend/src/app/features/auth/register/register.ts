@@ -1,5 +1,15 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
+
+export const passwordMatchValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+  const password = control.get('password');
+  const confirmPassword = control.get('confirmPassword');
+  
+  if (password && confirmPassword && password.value !== confirmPassword.value) {
+    return { passwordMismatch: true };
+  }
+  return null;
+};
 import { Router, RouterModule } from '@angular/router';
 import { Auth } from '../../../core/services/auth';
 import { CommonModule } from '@angular/common';
@@ -20,8 +30,9 @@ export class RegisterComponent {
   constructor(private fb: FormBuilder, private authService: Auth, private router: Router) {
     this.registerForm = this.fb.group({
       username: ['', [Validators.required, Validators.minLength(4)]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
-    });
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      confirmPassword: ['', Validators.required]
+    }, { validators: passwordMatchValidator });
   }
 
   onSubmit(): void {
@@ -30,7 +41,12 @@ export class RegisterComponent {
       this.successMessage = '';
       this.isLoading = true;
       
-      this.authService.register(this.registerForm.value).subscribe({
+      const credentials = {
+        username: this.registerForm.value.username,
+        password: this.registerForm.value.password
+      };
+      
+      this.authService.register(credentials).subscribe({
         next: (res) => {
           this.successMessage = 'Registration successful! Redirecting...';
           setTimeout(() => {

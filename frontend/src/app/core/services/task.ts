@@ -1,6 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { ApiService } from './api';
 import { Observable, tap } from 'rxjs';
+import { environment } from '../../../environment';
 
 export interface TaskItem {
   id?: number;
@@ -25,7 +26,21 @@ export class Task {
   }
 
   getTaskById(id: number): Observable<TaskItem> {
-    return this.api.get<TaskItem>(`/tasks/${id}`);
+    return new Observable<TaskItem>(observer => {
+      const token = localStorage.getItem('token');
+      fetch(`${environment.apiUrl}/tasks/${id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      .then(async res => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        observer.next(data);
+        observer.complete();
+      })
+      .catch(err => observer.error(err));
+    });
   }
 
   createTask(task: TaskItem): Observable<TaskItem> {

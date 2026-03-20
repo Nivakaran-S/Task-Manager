@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Task, TaskItem } from '../../../core/services/task';
 import { CommonModule } from '@angular/common';
@@ -11,9 +11,9 @@ import { CommonModule } from '@angular/common';
   styleUrl: './task-detail.scss'
 })
 export class TaskDetailComponent implements OnInit {
-  task: TaskItem | null = null;
-  loading: boolean = true;
-  errorMessage: string = '';
+  task = signal<TaskItem | null>(null);
+  loading = signal<boolean>(true);
+  errorMessage = signal<string>('');
 
   constructor(
     private route: ActivatedRoute,
@@ -22,30 +22,42 @@ export class TaskDetailComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.route.params.subscribe(params => {
-      const id = params['id'];
+    this.route.paramMap.subscribe(params => {
+      const id = params.get('id');
       if (id) {
         this.fetchTaskDetails(+id);
+      } else {
+        this.loading.set(false);
+        this.errorMessage.set('Invalid task ID.');
       }
     });
   }
 
   fetchTaskDetails(id: number): void {
+    this.loading.set(true);
+    this.errorMessage.set('');
+    
     this.taskService.getTaskById(id).subscribe({
       next: (data) => {
-        this.task = data;
-        this.loading = false;
+        if (!data) {
+          this.errorMessage.set('Task not found.');
+        } else {
+          this.task.set(data);
+        }
+        this.loading.set(false);
       },
       error: (err) => {
-        this.errorMessage = 'Could not load task details.';
-        this.loading = false;
+        console.error('Fetch error:', err);
+        this.errorMessage.set('Could not load task details.');
+        this.loading.set(false);
       }
     });
   }
 
   deleteTask(): void {
-    if (this.task && this.task.id && confirm('Are you sure you want to delete this task?')) {
-      this.taskService.deleteTask(this.task.id).subscribe(() => {
+    const currentTask = this.task();
+    if (currentTask && currentTask.id && confirm('Are you sure you want to delete this task?')) {
+      this.taskService.deleteTask(currentTask.id).subscribe(() => {
         this.router.navigate(['/tasks']);
       });
     }

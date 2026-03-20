@@ -4,17 +4,17 @@
       <button class="back-btn" routerLink="/tasks">
         ← Back
       </button>
-      <h2>{{ isEditMode ? 'Edit Task' : 'New Task' }}</h2>
+      <h2>{{ isEditMode() ? 'Edit Task' : 'New Task' }}</h2>
     </div>
 
-    <div *ngIf="isLoading" class="loading-state">
+    <div *ngIf="isLoading()" class="loading-state">
       <div class="spinner"></div>
       <p>Loading...</p>
     </div>
 
-    <div *ngIf="errorMessage" class="error-alert">{{ errorMessage }}</div>
+    <div *ngIf="errorMessage()" class="error-alert">{{ errorMessage() }}</div>
 
-    <form *ngIf="!isLoading" [formGroup]="taskForm" (ngSubmit)="onSubmit()">
+    <form *ngIf="!isLoading()" [formGroup]="taskForm" (ngSubmit)="onSubmit()">
       
       <div class="input-group">
         <label>Title</label>
@@ -39,9 +39,9 @@
         </div>
       </div>
 
-      <button type="submit" class="submit-btn" [disabled]="taskForm.invalid || isSubmitting">
-        <span *ngIf="!isSubmitting">{{ isEditMode ? 'Update Task' : 'Create Task' }}</span>
-        <div class="spinner" *ngIf="isSubmitting"></div>
+      <button type="submit" class="submit-btn" [disabled]="taskForm.invalid || isSubmitting()">
+        <span *ngIf="!isSubmitting()">{{ isEditMode() ? 'Update Task' : 'Create Task' }}</span>
+        <div class="spinner" *ngIf="isSubmitting()"></div>
       </button>
 
     </form>

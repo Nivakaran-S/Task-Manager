@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
@@ -13,11 +13,11 @@ import { Task, TaskItem } from '../../../core/services/task';
 })
 export class TaskForm implements OnInit {
   taskForm: FormGroup;
-  isEditMode = false;
-  taskId?: number;
-  isLoading = false;
-  isSubmitting = false;
-  errorMessage = '';
+  isEditMode = signal(false);
+  taskId = signal<number | undefined>(undefined);
+  isLoading = signal(false);
+  isSubmitting = signal(false);
+  errorMessage = signal('');
 
   constructor(
     private fb: FormBuilder,
@@ -33,29 +33,39 @@ export class TaskForm implements OnInit {
   }
 
   ngOnInit() {
-    this.route.params.subscribe(params => {
-      if (params['id']) {
-        this.isEditMode = true;
-        this.taskId = +params['id'];
-        this.loadTask(this.taskId);
+    this.route.paramMap.subscribe(params => {
+      const id = params.get('id');
+      if (id) {
+        this.isEditMode.set(true);
+        this.taskId.set(+id);
+        this.loadTask(+id);
+      } else {
+        this.isLoading.set(false);
       }
     });
   }
 
   loadTask(id: number) {
-    this.isLoading = true;
+    this.isLoading.set(true);
+    this.errorMessage.set('');
+    
     this.taskService.getTaskById(id).subscribe({
       next: (task) => {
-        this.taskForm.patchValue({
-          title: task.title,
-          description: task.description,
-          status: task.status
-        });
-        this.isLoading = false;
+        if (task) {
+          this.taskForm.patchValue({
+            title: task.title,
+            description: task.description,
+            status: task.status
+          });
+        } else {
+          this.errorMessage.set('Task not found.');
+        }
+        this.isLoading.set(false);
       },
-      error: () => {
-        this.errorMessage = 'Failed to load task details';
-        this.isLoading = false;
+      error: (err) => {
+        console.error('TaskForm fetch error:', err);
+        this.errorMessage.set('Failed to load task details');
+        this.isLoading.set(false);
       }
     });
   }
@@ -63,24 +73,25 @@ export class TaskForm implements OnInit {
   onSubmit() {
     if (this.taskForm.invalid) return;
 
-    this.isSubmitting = true;
-    this.errorMessage = '';
+    this.isSubmitting.set(true);
+    this.errorMessage.set('');
     const taskData: TaskItem = this.taskForm.value;
+    const currentTaskId = this.taskId();
 
-    if (this.isEditMode && this.taskId) {
-      this.taskService.updateTask(this.taskId, taskData).subscribe({
+    if (this.isEditMode() && currentTaskId) {
+      this.taskService.updateTask(currentTaskId, taskData).subscribe({
         next: () => this.router.navigate(['/tasks']),
         error: (err) => {
-          this.errorMessage = err.message || 'Failed to update task';
-          this.isSubmitting = false;
+          this.errorMessage.set(err.message || 'Failed to update task');
+          this.isSubmitting.set(false);
         }
       });
     } else {
       this.taskService.createTask(taskData).subscribe({
         next: () => this.router.navigate(['/tasks']),
         error: (err) => {
-          this.errorMessage = err.message || 'Failed to create task';
-          this.isSubmitting = false;
+          this.errorMessage.set(err.message || 'Failed to create task');
+          this.isSubmitting.set(false);
         }
       });
     }
